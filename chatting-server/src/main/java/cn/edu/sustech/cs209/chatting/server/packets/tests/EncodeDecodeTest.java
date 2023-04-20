@@ -1,11 +1,8 @@
 package cn.edu.sustech.cs209.chatting.server.packets.tests;
 
-import cn.edu.sustech.cs209.chatting.server.packets.GroupChatListPacket;
-import cn.edu.sustech.cs209.chatting.server.packets.LoginPacket;
-import cn.edu.sustech.cs209.chatting.server.packets.RegisterPacket;
+import cn.edu.sustech.cs209.chatting.server.packets.*;
 import cn.edu.sustech.cs209.chatting.server.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.server.packets.exceptions.EncodeException;
-import cn.edu.sustech.cs209.chatting.server.packets.IndividualChatListPacket;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,5 +61,29 @@ public class EncodeDecodeTest {
     pp.decodeFrom(buffer);
     Assert.assertEquals(username, pp.getUsername());
     Assert.assertEquals(password, pp.getPassword());
+  }
+
+  @Test
+  public void testOKPkt() throws EncodeException, DecodeException {
+    OKPacket okPacket = new OKPacket();
+    OKPacket okPacket1 = new OKPacket();
+    okPacket1.decodeFrom(okPacket.toBytes());
+  }
+
+  @Test
+  public void testFailPktWithoutReason() throws EncodeException, DecodeException {
+    FailPacket failPacket = new FailPacket();
+    FailPacket failPacket1 = new FailPacket();
+    failPacket1.decodeFrom(failPacket.toBytes());
+    Assert.assertEquals("", failPacket1.getReason());
+  }
+
+  @Test
+  public void testFailPktWithReason() throws EncodeException, DecodeException {
+    String prompt = "wrong password";
+    FailPacket failPacket = new FailPacket(prompt);
+    FailPacket failPacket1 = new FailPacket();
+    failPacket1.decodeFrom(failPacket.toBytes());
+    Assert.assertEquals(prompt, failPacket1.getReason());
   }
 }

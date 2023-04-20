@@ -28,6 +28,9 @@ public class GroupChatListPacket extends BasePacket {
     try {
       for (String username : groupList) {
         byte[] bytes = username.getBytes(StandardCharsets.UTF_8);
+        if (bytes.length > Byte.MAX_VALUE) {
+          throw new EncodeException();
+        }
         bs.write(bytes.length);
         bs.write(bytes);
       }

@@ -28,6 +28,9 @@ public class IndividualChatListPacket extends BasePacket {
     try {
       for (String username : individualList) {
         byte[] bytes = username.getBytes(StandardCharsets.UTF_8);
+        if (bytes.length > Byte.MAX_VALUE) {
+          throw new EncodeException();
+        }
         bs.write(bytes.length);
         bs.write(bytes);
       }
