@@ -10,5 +10,6 @@ enum PacketTypes {
   MSG_SEND,
   MSG_RECV,
   NEW_GROUP,
-  ACK
+  ACK,
+  LAST_RECV,
 }

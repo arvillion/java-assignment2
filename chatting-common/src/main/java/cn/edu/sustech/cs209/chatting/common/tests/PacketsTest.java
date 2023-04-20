@@ -137,4 +137,13 @@ public class PacketsTest {
     newGroupPacket1.decodeFrom(newGroupPacket.toBytes());
     Assert.assertArrayEquals(members.toArray(), newGroupPacket1.getMembers().toArray());
   }
+
+  @Test
+  public void testLastRecvPkt() throws EncodeException, DecodeException {
+    LastRecvPacket lastRecvPacket = new LastRecvPacket("G:group11", new Date().getTime());
+    LastRecvPacket lastRecvPacket1 = new LastRecvPacket();
+    lastRecvPacket1.decodeFrom(lastRecvPacket.toBytes());
+    Assert.assertEquals(lastRecvPacket.getChatId(), lastRecvPacket1.getChatId());
+    Assert.assertEquals(lastRecvPacket.getLastTimestamp(), lastRecvPacket1.getLastTimestamp());
+  }
 }
