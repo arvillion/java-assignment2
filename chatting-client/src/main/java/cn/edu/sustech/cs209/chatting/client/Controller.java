@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,10 +24,20 @@ public class Controller implements Initializable {
     @FXML
     ListView<Message> chatContentList;
 
+    Service service;
+
     String username;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        try {
+            service = new Service();
+            service.hello();
+        } catch (IOException e) {
+            System.out.println("Unable to connect to the server");
+            throw new RuntimeException(e);
+        }
 
         Dialog<String> dialog = new TextInputDialog();
         dialog.setTitle("Login");
