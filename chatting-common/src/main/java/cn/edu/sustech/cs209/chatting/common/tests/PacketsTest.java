@@ -1,4 +1,4 @@
-package cn.edu.sustech.cs209.chatting.common.packets.tests;
+package cn.edu.sustech.cs209.chatting.common.tests;
 
 import cn.edu.sustech.cs209.chatting.common.messages.TextMessage;
 import cn.edu.sustech.cs209.chatting.common.packets.*;
@@ -9,11 +9,10 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class EncodeDecodeTest {
+public class PacketsTest {
   @Test
   public void testIndividualChatListPacket() throws EncodeException, DecodeException {
     List<String> nameList = new ArrayList<>();
@@ -118,5 +117,24 @@ public class EncodeDecodeTest {
     Assert.assertEquals(sentBy, textMessage1.getSentBy());
     Assert.assertEquals(sentTo, textMessage1.getSendTo());
     Assert.assertEquals(text, textMessage1.getText());
+  }
+
+  @Test
+  public void testAck() throws EncodeException, DecodeException {
+    AckPacket ackPacket = new AckPacket();
+    AckPacket ackPacket1 = new AckPacket();
+    ackPacket1.decodeFrom(ackPacket.toBytes());
+  }
+
+  @Test
+  public void testNewGroupPkt() throws EncodeException, DecodeException {
+    List<String> members = new ArrayList<>();
+    members.add("David");
+    members.add("Johu");
+    members.add("小明");
+    NewGroupPacket newGroupPacket = new NewGroupPacket(members);
+    NewGroupPacket newGroupPacket1 = new NewGroupPacket();
+    newGroupPacket1.decodeFrom(newGroupPacket.toBytes());
+    Assert.assertArrayEquals(members.toArray(), newGroupPacket1.getMembers().toArray());
   }
 }
