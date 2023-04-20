@@ -1,14 +1,14 @@
-package cn.edu.sustech.cs209.chatting.server.packets;
+package cn.edu.sustech.cs209.chatting.common.packets;
 
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.DecodeException;
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.EncodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 
 import java.nio.ByteBuffer;
 
 public class OKPacket extends BasePacket {
 
   public OKPacket() {
-    type = PacketTypes.OK;
+    super(PacketTypes.OK);
   }
   @Override
   protected ByteBuffer encode() throws EncodeException {

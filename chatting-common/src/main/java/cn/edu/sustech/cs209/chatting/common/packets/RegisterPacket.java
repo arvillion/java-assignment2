@@ -1,8 +1,9 @@
-package cn.edu.sustech.cs209.chatting.server.packets;
+package cn.edu.sustech.cs209.chatting.common.packets;
 
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.DecodeException;
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.EncodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 
+import javax.swing.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,11 +14,11 @@ public class RegisterPacket extends BasePacket {
   private String password;
 
   public RegisterPacket() {
-    type = PacketTypes.REGISTER;
+    super(PacketTypes.REGISTER);
   }
 
   public RegisterPacket(String uname, String upass) {
-    type = PacketTypes.REGISTER;
+    super(PacketTypes.REGISTER);
     username = uname;
     password = upass;
   }

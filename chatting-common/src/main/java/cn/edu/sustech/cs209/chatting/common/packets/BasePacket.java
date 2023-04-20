@@ -1,7 +1,7 @@
-package cn.edu.sustech.cs209.chatting.server.packets;
+package cn.edu.sustech.cs209.chatting.common.packets;
 
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.DecodeException;
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.EncodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 
 import java.nio.ByteBuffer;
 
@@ -11,11 +11,17 @@ enum PacketTypes{
   LOGIN,
   REGISTER,
   OK,
-  FAIL
+  FAIL,
+  MSG_SEND,
+  MSG_RECV
 }
 
 public abstract class BasePacket {
   PacketTypes type;
+
+  BasePacket(PacketTypes type) {
+    this.type = type;
+  }
   protected abstract ByteBuffer encode() throws EncodeException;
   protected abstract void decode(ByteBuffer buffer) throws DecodeException;
 

@@ -1,7 +1,7 @@
-package cn.edu.sustech.cs209.chatting.server.packets;
+package cn.edu.sustech.cs209.chatting.common.packets;
 
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.DecodeException;
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.EncodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,11 +13,11 @@ public class LoginPacket extends BasePacket{
   private String password;
 
   public LoginPacket() {
-    type = PacketTypes.LOGIN;
+    super(PacketTypes.LOGIN);
   }
 
   public LoginPacket(String uname, String upass) {
-    type = PacketTypes.LOGIN;
+    super(PacketTypes.LOGIN);
     username = uname;
     password = upass;
   }

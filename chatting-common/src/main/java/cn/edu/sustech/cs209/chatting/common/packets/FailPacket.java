@@ -1,12 +1,11 @@
-package cn.edu.sustech.cs209.chatting.server.packets;
+package cn.edu.sustech.cs209.chatting.common.packets;
 
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.DecodeException;
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.EncodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class FailPacket extends BasePacket {
@@ -17,12 +16,12 @@ public class FailPacket extends BasePacket {
   private String reason;
 
   public FailPacket() {
-    type = PacketTypes.FAIL;
+    super(PacketTypes.FAIL);
     reason = "";
   }
 
   public FailPacket(String text) {
-    type = PacketTypes.FAIL;
+    super(PacketTypes.FAIL);
     reason = text;
   }
 

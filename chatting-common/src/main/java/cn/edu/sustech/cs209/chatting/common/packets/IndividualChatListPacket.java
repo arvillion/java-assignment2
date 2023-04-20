@@ -1,7 +1,7 @@
-package cn.edu.sustech.cs209.chatting.server.packets;
+package cn.edu.sustech.cs209.chatting.common.packets;
 
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.DecodeException;
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.EncodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,11 +13,11 @@ import java.util.List;
 public class IndividualChatListPacket extends BasePacket {
   private List<String> individualList;
   public IndividualChatListPacket(List<String> list) {
-    type = PacketTypes.INDIVIDUAL_CHAT_LIST;
+    super(PacketTypes.INDIVIDUAL_CHAT_LIST);
     individualList = list;
   }
   public IndividualChatListPacket() {
-    type = PacketTypes.INDIVIDUAL_CHAT_LIST;
+    super(PacketTypes.INDIVIDUAL_CHAT_LIST);
     individualList = new ArrayList<>();
   }
 

@@ -1,6 +1,8 @@
-package cn.edu.sustech.cs209.chatting.common;
+package cn.edu.sustech.cs209.chatting.common.messages;
 
-public class Message {
+import java.nio.ByteBuffer;
+
+public abstract class BaseMessage {
 
     private Long timestamp;
 
@@ -8,13 +10,10 @@ public class Message {
 
     private String sendTo;
 
-    private String data;
-
-    public Message(Long timestamp, String sentBy, String sendTo, String data) {
+    public BaseMessage(Long timestamp, String sentBy, String sendTo) {
         this.timestamp = timestamp;
         this.sentBy = sentBy;
         this.sendTo = sendTo;
-        this.data = data;
     }
 
     public Long getTimestamp() {
@@ -29,7 +28,8 @@ public class Message {
         return sendTo;
     }
 
-    public String getData() {
-        return data;
-    }
+
+
+    public abstract ByteBuffer encodeContent() throws Exception;
+    public abstract void decodeContent(ByteBuffer buffer) throws Exception;
 }

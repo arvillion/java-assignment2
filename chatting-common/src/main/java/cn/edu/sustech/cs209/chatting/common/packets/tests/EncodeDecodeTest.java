@@ -1,13 +1,16 @@
-package cn.edu.sustech.cs209.chatting.server.packets.tests;
+package cn.edu.sustech.cs209.chatting.common.packets.tests;
 
-import cn.edu.sustech.cs209.chatting.server.packets.*;
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.DecodeException;
-import cn.edu.sustech.cs209.chatting.server.packets.exceptions.EncodeException;
+import cn.edu.sustech.cs209.chatting.common.messages.TextMessage;
+import cn.edu.sustech.cs209.chatting.common.packets.*;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class EncodeDecodeTest {
@@ -85,5 +88,35 @@ public class EncodeDecodeTest {
     FailPacket failPacket1 = new FailPacket();
     failPacket1.decodeFrom(failPacket.toBytes());
     Assert.assertEquals(prompt, failPacket1.getReason());
+  }
+
+  @Test
+  public void testSendMessagePkt() throws EncodeException, DecodeException {
+    String sentBy = "U:user1";
+    String sentTo = "U:user2";
+    String text = "ok";
+    TextMessage textMessage = new TextMessage(new Date().getTime(), sentBy, sentTo, text);
+    SendMessagePacket sendMessagePacket = new SendMessagePacket(textMessage);
+    SendMessagePacket sendMessagePacket1 = new SendMessagePacket();
+    sendMessagePacket1.decodeFrom(sendMessagePacket.toBytes());
+    TextMessage textMessage1 = (TextMessage) sendMessagePacket1.getBaseMessage();
+    Assert.assertEquals(sentBy, textMessage1.getSentBy());
+    Assert.assertEquals(sentTo, textMessage1.getSendTo());
+    Assert.assertEquals(text, textMessage1.getText());
+  }
+
+  @Test
+  public void testRecvMessagePkt() throws EncodeException, DecodeException {
+    String sentBy = "U:user1";
+    String sentTo = "U:user2";
+    String text = "ok";
+    TextMessage textMessage = new TextMessage(new Date().getTime(), sentBy, sentTo, text);
+    RecvMessagePacket recvMessagePacket = new RecvMessagePacket(textMessage);
+    RecvMessagePacket recvMessagePacket1 = new RecvMessagePacket();
+    recvMessagePacket1.decodeFrom(recvMessagePacket.toBytes());
+    TextMessage textMessage1 = (TextMessage) recvMessagePacket1.getBaseMessage();
+    Assert.assertEquals(sentBy, textMessage1.getSentBy());
+    Assert.assertEquals(sentTo, textMessage1.getSendTo());
+    Assert.assertEquals(text, textMessage1.getText());
   }
 }

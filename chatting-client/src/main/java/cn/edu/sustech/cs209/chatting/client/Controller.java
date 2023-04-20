@@ -1,6 +1,6 @@
 package cn.edu.sustech.cs209.chatting.client;
 
-import cn.edu.sustech.cs209.chatting.common.Message;
+import cn.edu.sustech.cs209.chatting.common.messages.BaseMessage;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Controller implements Initializable {
 
     @FXML
-    ListView<Message> chatContentList;
+    ListView<BaseMessage> chatContentList;
 
     Service service;
 
@@ -115,13 +115,13 @@ public class Controller implements Initializable {
      * You may change the cell factory if you changed the design of {@code Message} model.
      * Hint: you may also define a cell factory for the chats displayed in the left panel, or simply override the toString method.
      */
-    private class MessageCellFactory implements Callback<ListView<Message>, ListCell<Message>> {
+    private class MessageCellFactory implements Callback<ListView<BaseMessage>, ListCell<BaseMessage>> {
         @Override
-        public ListCell<Message> call(ListView<Message> param) {
-            return new ListCell<Message>() {
+        public ListCell<BaseMessage> call(ListView<BaseMessage> param) {
+            return new ListCell<BaseMessage>() {
 
                 @Override
-                public void updateItem(Message msg, boolean empty) {
+                public void updateItem(BaseMessage msg, boolean empty) {
                     super.updateItem(msg, empty);
                     if (empty || Objects.isNull(msg)) {
                         return;
