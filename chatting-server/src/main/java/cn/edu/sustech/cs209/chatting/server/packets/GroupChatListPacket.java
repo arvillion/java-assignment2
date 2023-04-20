@@ -10,15 +10,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IndividualChatListPacket extends BasePacket {
-  private List<String> individualList;
-  public IndividualChatListPacket(List<String> list) {
-    type = PacketTypes.INDIVIDUAL_CHAT_LIST;
-    individualList = list;
+public class GroupChatListPacket extends BasePacket {
+  private List<String> groupList;
+  public GroupChatListPacket(List<String> list) {
+    type = PacketTypes.GROUP_CHAT_LIST;
+    groupList = list;
   }
-  public IndividualChatListPacket() {
-    type = PacketTypes.INDIVIDUAL_CHAT_LIST;
-    individualList = new ArrayList<>();
+  public GroupChatListPacket() {
+    type = PacketTypes.GROUP_CHAT_LIST;
+    groupList = new ArrayList<>();
   }
 
   @Override
@@ -26,7 +26,7 @@ public class IndividualChatListPacket extends BasePacket {
     ByteArrayOutputStream bs = new ByteArrayOutputStream();
 //    DataOutputStream ds = new DataOutputStream(bs);
     try {
-      for (String username : individualList) {
+      for (String username : groupList) {
         byte[] bytes = username.getBytes(StandardCharsets.UTF_8);
         bs.write(bytes.length);
         bs.write(bytes);
@@ -44,11 +44,11 @@ public class IndividualChatListPacket extends BasePacket {
       int nameLen = buffer.get();
       byte[] nameBuf = new byte[nameLen];
       buffer.get(nameBuf);
-      individualList.add(new String(nameBuf));
+      groupList.add(new String(nameBuf));
     }
   }
 
-  public List<String> getIndividualList() {
-    return individualList;
+  public List<String> getGroupList() {
+    return groupList;
   }
 }
