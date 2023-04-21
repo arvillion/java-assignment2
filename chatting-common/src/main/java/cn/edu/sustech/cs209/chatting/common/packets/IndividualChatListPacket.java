@@ -13,11 +13,11 @@ import java.util.List;
 public class IndividualChatListPacket extends BasePacket {
   private List<String> individualList;
   public IndividualChatListPacket(List<String> list) {
-    super(PacketTypes.INDIVIDUAL_CHAT_LIST);
+    super(PacketType.INDIVIDUAL_CHAT_LIST);
     individualList = list;
   }
   public IndividualChatListPacket() {
-    super(PacketTypes.INDIVIDUAL_CHAT_LIST);
+    super(PacketType.INDIVIDUAL_CHAT_LIST);
     individualList = new ArrayList<>();
   }
 

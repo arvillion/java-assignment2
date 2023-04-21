@@ -1,34 +1,43 @@
 package cn.edu.sustech.cs209.chatting.server;
 
+import cn.edu.sustech.cs209.chatting.server.exceptions.InvalidInputException;
+import cn.edu.sustech.cs209.chatting.server.exceptions.WrongUnameException;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Server {
-  private static Map<String, User> registeredUsers;
-  private static Map<String, User> onlineUsers;
+public class Server implements Runnable {
+  private static Map<String, User> registeredUsers = new HashMap<>();
+  private static Map<String, User> onlineUsers = new HashMap<>();
 
-  private static Map<String, Group> groups;
+  private static Map<String, Group> groups = new HashMap<>();
 
-  public static User userLogin(String username) throws ServerException {
+  private int LISTEN_PORT = 23456;
+
+  public static User userLogin(String username) throws InvalidInputException, WrongUnameException {
     username = username.trim();
     if (username.length() == 0) {
-      throw new ServerException("username must not be null");
+      throw new InvalidInputException("username must not be null");
     }
     if (!registeredUsers.containsKey(username)) {
-      throw new ServerException("no such a user");
+      throw new WrongUnameException();
     }
     User user = registeredUsers.get(username);
     onlineUsers.put(username, user);
     return user;
   }
 
-  public static void userRegister(String username) throws ServerException {
+  public static void userRegister(String username) throws InvalidInputException, WrongUnameException {
     username = username.trim();
     if (username.length() == 0) {
-      throw new ServerException("username must not be null");
+      throw new InvalidInputException("username must not be null");
     }
     if (registeredUsers.containsKey(username)) {
-      throw new ServerException("username already exists");
+      throw new WrongUnameException();
     }
     User user = new User(username);
     registeredUsers.put(username, user);
@@ -59,7 +68,28 @@ public class Server {
     }
   }
 
+  public Server() {}
+  public Server(int port) {
+    LISTEN_PORT = port;
+  }
 
+  @Override
+  public void run() {
+
+    try {
+      ServerSocket server = new ServerSocket(LISTEN_PORT);
+      System.out.println("Waiting for clients to connect...");
+      while (true) {
+        Socket s = server.accept();
+
+        System.out.printf("[%d] Client connected\n", s.getPort());
+        Thread t = new Thread(new ClientHandler(s));
+        t.start();
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
 
 

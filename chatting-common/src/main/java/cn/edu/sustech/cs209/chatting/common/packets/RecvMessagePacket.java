@@ -10,7 +10,6 @@ import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -20,19 +19,19 @@ public class RecvMessagePacket extends BasePacket {
 
 
   public RecvMessagePacket(TextMessage textMessage) {
-    super(PacketTypes.MSG_RECV);
+    super(PacketType.MSG_RECV);
     this.baseMessage = textMessage;
     type = MessageType.TEXT;
   }
 
   public RecvMessagePacket(FileMetaMessage fileMetaMessage) {
-    super(PacketTypes.MSG_RECV);
+    super(PacketType.MSG_RECV);
     this.baseMessage = fileMetaMessage;
     type = MessageType.FILE_META;
   }
 
   public RecvMessagePacket() {
-    super(PacketTypes.MSG_RECV);
+    super(PacketType.MSG_RECV);
   }
 
   @Override
@@ -77,7 +76,7 @@ public class RecvMessagePacket extends BasePacket {
     return baseMessage;
   }
 
-  public MessageType getType() {
+  public MessageType getMessageType() {
     return type;
   }
 }

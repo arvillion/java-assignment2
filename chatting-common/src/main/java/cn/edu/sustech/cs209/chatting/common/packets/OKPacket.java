@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 public class OKPacket extends BasePacket {
 
   public OKPacket() {
-    super(PacketTypes.OK);
+    super(PacketType.OK);
   }
   @Override
   protected ByteBuffer encode() throws EncodeException {

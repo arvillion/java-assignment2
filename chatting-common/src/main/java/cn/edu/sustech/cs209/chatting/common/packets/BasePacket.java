@@ -6,13 +6,17 @@ import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 import java.nio.ByteBuffer;
 
 public abstract class BasePacket {
-  PacketTypes type;
+  PacketType type;
 
-  BasePacket(PacketTypes type) {
+  BasePacket(PacketType type) {
     this.type = type;
   }
   protected abstract ByteBuffer encode() throws EncodeException;
   protected abstract void decode(ByteBuffer buffer) throws DecodeException;
+
+  public PacketType getType() {
+    return type;
+  }
 
   public ByteBuffer toBytes() throws EncodeException{
     ByteBuffer bodyBuffer = encode();

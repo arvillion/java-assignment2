@@ -16,12 +16,12 @@ public class FailPacket extends BasePacket {
   private String reason;
 
   public FailPacket() {
-    super(PacketTypes.FAIL);
+    super(PacketType.FAIL);
     reason = "";
   }
 
   public FailPacket(String text) {
-    super(PacketTypes.FAIL);
+    super(PacketType.FAIL);
     reason = text;
   }
 

@@ -13,11 +13,11 @@ public class LoginPacket extends BasePacket{
   private String password;
 
   public LoginPacket() {
-    super(PacketTypes.LOGIN);
+    super(PacketType.LOGIN);
   }
 
   public LoginPacket(String uname, String upass) {
-    super(PacketTypes.LOGIN);
+    super(PacketType.LOGIN);
     username = uname;
     password = upass;
   }

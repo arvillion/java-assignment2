@@ -5,7 +5,6 @@ import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -16,12 +15,12 @@ public class NewGroupPacket extends BasePacket {
 
   private List<String> members;
   public NewGroupPacket() {
-    super(PacketTypes.NEW_GROUP);
+    super(PacketType.NEW_GROUP);
     members = new ArrayList<>();
   }
 
   public NewGroupPacket(List<String> mems) {
-    super(PacketTypes.NEW_GROUP);
+    super(PacketType.NEW_GROUP);
     members = mems;
   }
 

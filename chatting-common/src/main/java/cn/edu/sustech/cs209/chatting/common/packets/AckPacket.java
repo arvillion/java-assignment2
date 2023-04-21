@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 public class AckPacket extends BasePacket {
 
   public AckPacket() {
-    super(PacketTypes.ACK);
+    super(PacketType.ACK);
   }
   @Override
   protected ByteBuffer encode() throws EncodeException {

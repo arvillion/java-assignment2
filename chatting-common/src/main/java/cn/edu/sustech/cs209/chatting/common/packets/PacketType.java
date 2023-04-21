@@ -1,6 +1,6 @@
 package cn.edu.sustech.cs209.chatting.common.packets;
 
-enum PacketTypes {
+public enum PacketType {
   INDIVIDUAL_CHAT_LIST,
   GROUP_CHAT_LIST,
   LOGIN,
@@ -11,5 +11,9 @@ enum PacketTypes {
   MSG_RECV,
   NEW_GROUP,
   ACK,
-  LAST_RECV,
+  LAST_RECV;
+
+  public static PacketType get(int index) {
+    return values()[index];
+  }
 }

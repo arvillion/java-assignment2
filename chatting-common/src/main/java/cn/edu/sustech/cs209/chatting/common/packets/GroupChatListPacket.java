@@ -13,11 +13,11 @@ import java.util.List;
 public class GroupChatListPacket extends BasePacket {
   private List<String> groupList;
   public GroupChatListPacket(List<String> list) {
-    super(PacketTypes.GROUP_CHAT_LIST);
+    super(PacketType.GROUP_CHAT_LIST);
     groupList = list;
   }
   public GroupChatListPacket() {
-    super(PacketTypes.GROUP_CHAT_LIST);
+    super(PacketType.GROUP_CHAT_LIST);
     groupList = new ArrayList<>();
   }
 

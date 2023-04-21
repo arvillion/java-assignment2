@@ -1,81 +1,137 @@
 package cn.edu.sustech.cs209.chatting.server;
+import cn.edu.sustech.cs209.chatting.common.packets.PacketReader;
+import cn.edu.sustech.cs209.chatting.common.packets.*;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
+import cn.edu.sustech.cs209.chatting.server.exceptions.InvalidInputException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.InvalidPacketException;
+import cn.edu.sustech.cs209.chatting.server.exceptions.NotLoginException;
+import cn.edu.sustech.cs209.chatting.server.exceptions.WrongUnameException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.net.Socket;
-import java.util.logging.Logger;
+import java.nio.ByteBuffer;
 
 
 public class ClientHandler implements Runnable{
   private Socket s;
   private User user;
-  private BufferedReader in;
-  private PrintWriter out;
-  private final Logger LOGGER = Logger.getLogger(ClientHandler.class.getName());
+  private InputStream in;
+  private OutputStream out;
 
-  public void onLogin(String username) {
+  private Logger logger;
+
+  private void handleLogin(LoginPacket pkt) throws IOException {
+    String username = pkt.getUsername();
+    String password = pkt.getPassword();
+    logger.info("Receive packet [LOGIN]: uname={} pwd={}", username, password);
+    // TODO: verify password
     try {
       user = Server.userLogin(username);
-    } catch (ServerException e) {
-      LOGGER.warning(e.getMessage());
-      sendFail("fail to login");
+      sendOK();
+    } catch (InvalidInputException e) {
+      sendFail("Invalid input");
+    } catch (WrongUnameException e) {
+      sendFail("Wrong username or password");
     }
-    LOGGER.info(String.format("[%s] login successfully", username));
-    sendOK();
   }
 
-  public void sendOK() {
+  private void handleRegister(RegisterPacket pkt) throws IOException {
+    String username = pkt.getUsername();
+    String password = pkt.getPassword();
+    logger.info("Receive packet [REGISTER]: uname={} pwd={}", username, password);
+    // TODO: password support
+    try {
+      Server.userRegister(username);
+      sendOK();
+    } catch (InvalidInputException e) {
+      sendFail("Invalid input");
+    } catch (WrongUnameException e) {
+      sendFail("Username already exists");
+    }
+  }
+
+  private void handleUnknown() {
 
   }
 
-  public void sendFail(String reason) {
-
+  private void sendFail(String reason) throws IOException {
+    logger.info("Send packet [FAIL]: {}", reason);
+    FailPacket failPacket = new FailPacket(reason);
+    packetSend(failPacket);
   }
 
-  public void sendFail() {
-
+  private void sendOK() throws IOException {
+    logger.info("Send packet [OK]");
+    OKPacket okPacket = new OKPacket();
+    packetSend(okPacket);
   }
 
+  private void packetSend(BasePacket basePacket) throws IOException {
+    try {
+      ByteBuffer buf = basePacket.toBytes();
+      out.write(buf.array());
+    } catch (EncodeException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
+  private void requireLogined() throws NotLoginException {
+    if (user == null) {
+      logger.warn("Unauthorized");
+      throw new NotLoginException();
+    }
+  }
+
+  private void quit() throws NotLoginException {
+    requireLogined();
+    logger.info("User \"{}\" quits", user.getName());
+    Server.userQuit(user.getName());
+  }
 
   @Override
   public void run() {
-//    MDC.put("client_port", String.valueOf(s.getPort()));
     try {
-      configureLogger();
-    } catch (UnsupportedEncodingException e) {
+      in = s.getInputStream();
+      out = s.getOutputStream();
+      doService();
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
-//    try {
-//      s.getInputStream().
-//      in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-//      out = new PrintWriter(s.getOutputStream());
-//      doService();
-//    } catch (IOException e) {
-//      throw new RuntimeException(e);
-//    }
   }
 
-  private void configureLogger() throws UnsupportedEncodingException {
+  private void doService() throws IOException {
+    PacketReader packetReader = new PacketReader(in);
+    while (true) {
 
-  }
 
-  private void doService() {
-    try {
-      while (true) {
-        String command = in.readLine();
-        LOGGER.info(command);
-        if (command == null) {
-          LOGGER.info("[{}] close connection");
-          break;
-        }
-      }
-    } catch (IOException e) {
-      LOGGER.info("[{}] Client disconnected");
-    } finally {
       try {
-        s.close();
-      } catch (IOException e) {
-//        LOGGER.error();
+        BasePacket pkt = packetReader.readPacket();
+
+        switch (pkt.getType()) {
+          case LOGIN:
+            LoginPacket loginPacket = (LoginPacket) pkt;
+            handleLogin(loginPacket);
+            break;
+          case REGISTER:
+            RegisterPacket registerPacket = (RegisterPacket) pkt;
+            handleRegister(registerPacket);
+            break;
+          default:
+            handleUnknown();
+        }
+      } catch (InvalidPacketException e) {
+        logger.warn("Invalid packet");
+      } catch (DecodeException de) {
+        logger.warn("Fail to decode packet from bytes");
+      } catch (IOException ioe) {
+        try {
+          quit();
+          break;
+        } catch (NotLoginException e) {
+        }
       }
     }
 
@@ -83,5 +139,6 @@ public class ClientHandler implements Runnable{
 
   public ClientHandler(Socket aSocket) {
     s = aSocket;
+    logger = LoggerFactory.getLogger("client" + s.getPort());
   }
 }

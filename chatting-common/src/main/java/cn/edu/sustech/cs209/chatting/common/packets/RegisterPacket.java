@@ -3,7 +3,6 @@ package cn.edu.sustech.cs209.chatting.common.packets;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 
-import javax.swing.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -14,11 +13,11 @@ public class RegisterPacket extends BasePacket {
   private String password;
 
   public RegisterPacket() {
-    super(PacketTypes.REGISTER);
+    super(PacketType.REGISTER);
   }
 
   public RegisterPacket(String uname, String upass) {
-    super(PacketTypes.REGISTER);
+    super(PacketType.REGISTER);
     username = uname;
     password = upass;
   }

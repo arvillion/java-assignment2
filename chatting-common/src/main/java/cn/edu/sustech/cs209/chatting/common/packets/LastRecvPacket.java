@@ -15,11 +15,11 @@ public class LastRecvPacket extends BasePacket{
   private String chatId;
   private Long lastTimestamp;
   public LastRecvPacket() {
-    super(PacketTypes.LAST_RECV);
+    super(PacketType.LAST_RECV);
   }
 
   public LastRecvPacket(String chatId, long lastTimestamp) {
-    super(PacketTypes.LAST_RECV);
+    super(PacketType.LAST_RECV);
     this.chatId = chatId;
     this.lastTimestamp = lastTimestamp;
   }
