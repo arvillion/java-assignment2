@@ -132,9 +132,10 @@ public class PacketsTest {
     members.add("David");
     members.add("Johu");
     members.add("小明");
-    NewGroupPacket newGroupPacket = new NewGroupPacket(members);
+    NewGroupPacket newGroupPacket = new NewGroupPacket("group1", members);
     NewGroupPacket newGroupPacket1 = new NewGroupPacket();
     newGroupPacket1.decodeFrom(newGroupPacket.toBytes());
+    Assert.assertEquals("group1", newGroupPacket1.getGroupName());
     Assert.assertArrayEquals(members.toArray(), newGroupPacket1.getMembers().toArray());
   }
 

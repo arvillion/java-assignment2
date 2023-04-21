@@ -3,6 +3,8 @@ import cn.edu.sustech.cs209.chatting.common.packets.PacketReader;
 import cn.edu.sustech.cs209.chatting.common.packets.*;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
+import cn.edu.sustech.cs209.chatting.server.entities.User;
+import cn.edu.sustech.cs209.chatting.server.exceptions.DuplicateGroupNameException;
 import cn.edu.sustech.cs209.chatting.server.exceptions.InvalidInputException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.InvalidPacketException;
 import cn.edu.sustech.cs209.chatting.server.exceptions.NotLoginException;
@@ -13,6 +15,9 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class ClientHandler implements Runnable{
@@ -29,7 +34,8 @@ public class ClientHandler implements Runnable{
     logger.info("Receive packet [LOGIN]: uname={} pwd={}", username, password);
     // TODO: verify password
     try {
-      user = Server.userLogin(username);
+      user = Server.userLogin(username, this);
+      startNotification();
       sendOK();
     } catch (InvalidInputException e) {
       sendFail("Invalid input");
@@ -53,10 +59,39 @@ public class ClientHandler implements Runnable{
     }
   }
 
+  private void handleCreateGroup(NewGroupPacket pkt) throws IOException {
+    String groupName = pkt.getGroupName();
+    List<String> members = pkt.getMembers();
+    try {
+      Server.newGroup(groupName, members);
+      sendOK();
+
+    } catch (InvalidInputException e) {
+      sendFail(e.getMessage());
+    } catch (DuplicateGroupNameException e) {
+      sendFail(String.format("Group name \"%s\" already exists", groupName));
+    }
+  }
+
+
+
   private void handleUnknown() {
 
   }
 
+  private void sendIndividualChatList() throws IOException {
+    List<String> onlineUsers = Server.getOnlineUsers();
+    logger.info("Send packet [INDIVIDUAL_CHAT_LIST]: {}", onlineUsers);
+    IndividualChatListPacket packet = new IndividualChatListPacket(onlineUsers);
+    packetSend(packet);
+  }
+
+  private void sendGroupChatList() throws IOException {
+    List<String> groups = Server.getOwnGroups(user);
+    logger.info("Send packet [GROUP_CHAT_LIST]: {}", groups);
+    GroupChatListPacket packet = new GroupChatListPacket(groups);
+    packetSend(packet);
+  }
   private void sendFail(String reason) throws IOException {
     logger.info("Send packet [FAIL]: {}", reason);
     FailPacket failPacket = new FailPacket(reason);
@@ -100,6 +135,22 @@ public class ClientHandler implements Runnable{
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private void startNotification() {
+    final int GAP_UPDATE_CHAT_LIST = 1000;
+    new Timer().schedule(new TimerTask() {
+      @Override
+      public void run() {
+        try {
+          sendIndividualChatList();
+          sendGroupChatList();
+        } catch (IOException e) {
+          cancel();
+//          throw new RuntimeException(e);
+        }
+      }
+    }, 0, GAP_UPDATE_CHAT_LIST);
   }
 
   private void doService() throws IOException {

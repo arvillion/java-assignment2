@@ -1,4 +1,4 @@
-package cn.edu.sustech.cs209.chatting.server;
+package cn.edu.sustech.cs209.chatting.server.entities;
 
 import java.util.ArrayList;
 import java.util.List;

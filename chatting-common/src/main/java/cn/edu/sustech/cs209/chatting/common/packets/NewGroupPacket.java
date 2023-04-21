@@ -14,14 +14,20 @@ import java.util.List;
 public class NewGroupPacket extends BasePacket {
 
   private List<String> members;
+  private String groupName;
   public NewGroupPacket() {
     super(PacketType.NEW_GROUP);
     members = new ArrayList<>();
   }
 
-  public NewGroupPacket(List<String> mems) {
+  public NewGroupPacket(String groupName, List<String> mems) {
     super(PacketType.NEW_GROUP);
     members = mems;
+    this.groupName = groupName;
+  }
+
+  public String getGroupName() {
+    return groupName;
   }
 
   public List<String> getMembers() {
@@ -31,7 +37,9 @@ public class NewGroupPacket extends BasePacket {
   @Override
   protected ByteBuffer encode() throws EncodeException {
     ByteArrayOutputStream bs = new ByteArrayOutputStream();
+
     try {
+      Utils.writeShortString(groupName, bs, StandardCharsets.UTF_8);
       for (String user : members) {
         Utils.writeShortString(user, bs, StandardCharsets.UTF_8);
       }
@@ -43,6 +51,7 @@ public class NewGroupPacket extends BasePacket {
 
   @Override
   protected void decode(ByteBuffer buffer) throws DecodeException {
+    groupName = Utils.readShortString(buffer, StandardCharsets.UTF_8);
     while (buffer.hasRemaining()) {
       members.add(Utils.readShortString(buffer, StandardCharsets.UTF_8));
     }

@@ -49,6 +49,18 @@ public class PacketReader {
         FailPacket failPacket = new FailPacket();
         failPacket.decodeFrom(buf);
         return failPacket;
+      case INDIVIDUAL_CHAT_LIST:
+        IndividualChatListPacket individualChatListPacket = new IndividualChatListPacket();
+        individualChatListPacket.decodeFrom(buf);
+        return individualChatListPacket;
+      case GROUP_CHAT_LIST:
+        GroupChatListPacket groupChatListPacket = new GroupChatListPacket();
+        groupChatListPacket.decodeFrom(buf);
+        return groupChatListPacket;
+      case NEW_GROUP:
+        NewGroupPacket newGroupPacket = new NewGroupPacket();
+        newGroupPacket.decodeFrom(buf);
+        return newGroupPacket;
 
       default:
         throw new InvalidPacketException();

@@ -16,6 +16,7 @@ import java.net.Socket;
 
 public class ClientHandlerTest {
   final static int SERVER_PORT = 30045;
+  final static String HOST = "localhost";
   @BeforeClass
   public static void setUpServer() throws IOException {
 
@@ -74,4 +75,52 @@ public class ClientHandlerTest {
     basePacket = packetReader.readPacket();
     Assert.assertEquals(PacketType.OK, basePacket.getType());
   }
+
+  @Test
+  public void testGroupChatList() throws IOException {
+    Client client1 = new Client(HOST, SERVER_PORT);
+  }
+
+  @Test
+  public void testIndividualChatList() throws IOException, EncodeException, DecodeException, InvalidPacketException {
+    Client client1 = new Client(HOST, SERVER_PORT);
+    Client client2 = new Client(HOST, SERVER_PORT);
+    Client client3 = new Client(HOST, SERVER_PORT);
+
+    registerAndLogin(client1, "user1", "pwd");
+    BasePacket basePacket;
+    while((basePacket = client1.nextPacket()).getType() != PacketType.INDIVIDUAL_CHAT_LIST);
+    IndividualChatListPacket individualChatListPacket = (IndividualChatListPacket) basePacket;
+    Assert.assertEquals(1, individualChatListPacket.getIndividualList().size());
+
+
+    // user2 and user3 login
+    registerAndLogin(client2, "user2", "pwd");
+    registerAndLogin(client3, "user3", "pwd");
+
+    while((basePacket = client1.nextPacket()).getType() != PacketType.INDIVIDUAL_CHAT_LIST);
+    individualChatListPacket = (IndividualChatListPacket) basePacket;
+    Assert.assertEquals(3, individualChatListPacket.getIndividualList().size());
+
+  }
+
+  void register(Client client, String username, String password) throws IOException, EncodeException, DecodeException, InvalidPacketException {
+    client.register(username, password);
+    BasePacket basePacket = client.nextPacket();
+    Assert.assertEquals(PacketType.OK, basePacket.getType());
+  }
+
+  void login(Client client, String username, String password) throws IOException, EncodeException, DecodeException, InvalidPacketException {
+    client.login(username, password);
+    BasePacket basePacket = client.nextPacket();
+    Assert.assertEquals(PacketType.OK, basePacket.getType());
+  }
+
+  void registerAndLogin(Client client, String username, String password) throws EncodeException, IOException, DecodeException, InvalidPacketException {
+    register(client, username, password);
+    login(client, username,password);
+  }
+
+
+
 }

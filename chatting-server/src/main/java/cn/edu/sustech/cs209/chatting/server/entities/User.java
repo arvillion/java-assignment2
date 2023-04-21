@@ -1,6 +1,9 @@
-package cn.edu.sustech.cs209.chatting.server;
+package cn.edu.sustech.cs209.chatting.server.entities;
+
+import cn.edu.sustech.cs209.chatting.server.exceptions.DuplicateGroupNameException;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +16,8 @@ public class User {
 
   public User (String nam) {
     name = nam;
+    individualConversions = new HashMap<>();
+    groupConversions = new HashMap<>();
   }
   public String getName() {
     return name;
@@ -25,9 +30,9 @@ public class User {
     individualConversions.put(user, new Conversation());
   }
 
-  public void addGroupConversion(Group group, Conversation conversation) throws Exception {
+  public void addGroupConversion(Group group, Conversation conversation) throws DuplicateGroupNameException {
     if (groupConversions.containsKey(group)) {
-      throw new Exception("conversion already exists");
+      throw new DuplicateGroupNameException();
     }
     groupConversions.put(group, conversation);
   }

@@ -1,4 +1,4 @@
-package cn.edu.sustech.cs209.chatting.server;
+package cn.edu.sustech.cs209.chatting.server.entities;
 public class Message {
 
   private Long timestamp;
