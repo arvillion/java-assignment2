@@ -95,7 +95,7 @@ public class PacketsTest {
     String sentBy = "U:user1";
     String sentTo = "U:user2";
     String text = "ok";
-    TextMessage textMessage = new TextMessage(new Date().getTime(), sentBy, sentTo, text);
+    TextMessage textMessage = new TextMessage(UUID.randomUUID(), new Date().getTime(), sentBy, sentTo, text);
     SendMessagePacket sendMessagePacket = new SendMessagePacket(textMessage);
     SendMessagePacket sendMessagePacket1 = new SendMessagePacket();
     sendMessagePacket1.decodeFrom(sendMessagePacket.toBytes());
@@ -103,7 +103,7 @@ public class PacketsTest {
     Assert.assertEquals(sentBy, textMessage1.getSentBy());
     Assert.assertEquals(sentTo, textMessage1.getSendTo());
     Assert.assertEquals(text, textMessage1.getText());
-    Assert.assertEquals(sendMessagePacket.getMid(), sendMessagePacket1.getMid());
+    Assert.assertEquals(sendMessagePacket.getBaseMessage().getUuid(), sendMessagePacket1.getBaseMessage().getUuid());
   }
 
   @Test
@@ -111,7 +111,7 @@ public class PacketsTest {
     String sentBy = "U:user1";
     String sentTo = "U:user2";
     String text = "ok";
-    TextMessage textMessage = new TextMessage(new Date().getTime(), sentBy, sentTo, text);
+    TextMessage textMessage = new TextMessage(UUID.randomUUID(), new Date().getTime(), sentBy, sentTo, text);
     RecvMessagePacket recvMessagePacket = new RecvMessagePacket(textMessage);
     RecvMessagePacket recvMessagePacket1 = new RecvMessagePacket();
     recvMessagePacket1.decodeFrom(recvMessagePacket.toBytes());
@@ -119,6 +119,7 @@ public class PacketsTest {
     Assert.assertEquals(sentBy, textMessage1.getSentBy());
     Assert.assertEquals(sentTo, textMessage1.getSendTo());
     Assert.assertEquals(text, textMessage1.getText());
+    Assert.assertEquals(textMessage.getUuid(), textMessage1.getUuid());
   }
 
   @Test

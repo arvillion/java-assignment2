@@ -10,8 +10,8 @@ public class FileMetaMessage extends BaseMessage {
   private Long fileLength;
   private UUID fileId;
 
-  public FileMetaMessage(Long timestamp, String sentBy, String sendTo, String fileName, Long fileLength, UUID fileId) {
-    super(timestamp, sentBy, sendTo);
+  public FileMetaMessage(UUID uuid, Long timestamp, String sentBy, String sendTo, String fileName, Long fileLength, UUID fileId) {
+    super(uuid, timestamp, sentBy, sendTo);
 
     this.fileName = fileName;
     this.fileLength = fileLength;
@@ -19,8 +19,8 @@ public class FileMetaMessage extends BaseMessage {
 
   }
 
-  public FileMetaMessage(Long timestamp, String sentBy, String sendTo) {
-    super(timestamp, sentBy, sendTo);
+  public FileMetaMessage(UUID uuid, Long timestamp, String sentBy, String sendTo) {
+    super(uuid, timestamp, sentBy, sendTo);
   }
 
   @Override

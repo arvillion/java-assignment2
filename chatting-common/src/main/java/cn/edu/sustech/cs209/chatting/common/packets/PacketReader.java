@@ -61,6 +61,18 @@ public class PacketReader {
         NewGroupPacket newGroupPacket = new NewGroupPacket();
         newGroupPacket.decodeFrom(buf);
         return newGroupPacket;
+      case MSG_RECV:
+        RecvMessagePacket recvMessagePacket = new RecvMessagePacket();
+        recvMessagePacket.decodeFrom(buf);
+        return recvMessagePacket;
+      case MSG_SEND:
+        SendMessagePacket sendMessagePacket = new SendMessagePacket();
+        sendMessagePacket.decodeFrom(buf);
+        return sendMessagePacket;
+      case ACK:
+        AckPacket ackPacket = new AckPacket();
+        ackPacket.decodeFrom(buf);
+        return ackPacket;
 
       default:
         throw new InvalidPacketException();

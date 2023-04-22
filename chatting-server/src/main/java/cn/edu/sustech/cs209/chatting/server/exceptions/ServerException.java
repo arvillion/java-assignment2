@@ -7,6 +7,11 @@ public class ServerException extends Exception{
     errMsg = err;
   }
 
+  public ServerException() {
+    super();
+    errMsg = "";
+  }
+
   @Override
   public String getMessage() {
     return errMsg;

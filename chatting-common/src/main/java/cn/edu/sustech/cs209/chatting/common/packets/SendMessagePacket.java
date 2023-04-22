@@ -17,7 +17,6 @@ public class SendMessagePacket extends BasePacket{
 
   private BaseMessage baseMessage;
   private MessageType messageType;
-  private UUID mid = UUID.randomUUID();
 
 
   public SendMessagePacket(TextMessage textMessage) {
@@ -37,10 +36,6 @@ public class SendMessagePacket extends BasePacket{
 
   }
 
-  public UUID getMid() {
-    return mid;
-  }
-
   @Override
   protected ByteBuffer encode() throws EncodeException {
     ByteArrayOutputStream bs = new ByteArrayOutputStream();
@@ -48,7 +43,7 @@ public class SendMessagePacket extends BasePacket{
     try {
       ds.writeByte(messageType.ordinal());
       ds.writeLong(baseMessage.getTimestamp());
-      Utils.writeUUID(mid, ds);
+      Utils.writeUUID(baseMessage.getUuid(), ds);
 
       String sentBy = baseMessage.getSentBy();
       String sentTo = baseMessage.getSendTo();
@@ -67,15 +62,15 @@ public class SendMessagePacket extends BasePacket{
   protected void decode(ByteBuffer buffer) throws DecodeException {
     messageType = MessageType.get(buffer.get());
     Long timestamp = buffer.getLong();
-    mid = Utils.readUUID(buffer);
+    UUID uuid = Utils.readUUID(buffer);
     String sentBy = Utils.readShortString(buffer, StandardCharsets.UTF_8);
     String sentTo = Utils.readShortString(buffer, StandardCharsets.UTF_8);
     if (messageType == MessageType.TEXT) {
-      TextMessage textMessage = new TextMessage(timestamp, sentBy, sentTo);
+      TextMessage textMessage = new TextMessage(uuid, timestamp, sentBy, sentTo);
       textMessage.decodeContent(buffer);
       baseMessage = textMessage;
     } else {
-      FileMetaMessage fileMetaMessage = new FileMetaMessage(timestamp, sentBy, sentTo);
+      FileMetaMessage fileMetaMessage = new FileMetaMessage(uuid, timestamp, sentBy, sentTo);
       fileMetaMessage.decodeContent(buffer);
       baseMessage = fileMetaMessage;
     }

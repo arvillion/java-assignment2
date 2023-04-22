@@ -1,5 +1,7 @@
 package cn.edu.sustech.cs209.chatting.server.tests;
 
+import cn.edu.sustech.cs209.chatting.common.messages.MessageType;
+import cn.edu.sustech.cs209.chatting.common.messages.TextMessage;
 import cn.edu.sustech.cs209.chatting.common.packets.*;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
@@ -9,13 +11,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.print.DocFlavor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class ClientHandlerTest {
   int SERVER_PORT = 30045;
@@ -128,6 +129,41 @@ public class ClientHandlerTest {
     while((basePacket = client1.nextPacket()).getType() != PacketType.INDIVIDUAL_CHAT_LIST);
     individualChatListPacket = (IndividualChatListPacket) basePacket;
     Assert.assertEquals(3, individualChatListPacket.getIndividualList().size());
+
+  }
+
+  @Test
+  public void testTextMessage() throws IOException, EncodeException, DecodeException, InvalidPacketException {
+    Client client1 = new Client(HOST, SERVER_PORT);
+    Client client2 = new Client(HOST, SERVER_PORT);
+    registerAndLogin(client1, "user1", "pwd");
+    registerAndLogin(client2, "user2", "pwd");
+    UUID uuid;
+    String sentBy = "U:user1";
+    String sendTo = "U:user2";
+    String text = "hello";
+
+    BasePacket basePacket;
+
+    uuid = client1.sendTextMessage(sentBy, sendTo, text);
+    while((basePacket = client1.nextPacket()).getType() != PacketType.ACK);
+    AckPacket ackPacket = (AckPacket) basePacket;
+    Assert.assertEquals(uuid, ackPacket.getMid());
+
+
+    while((basePacket = client2.nextPacket()).getType() != PacketType.MSG_RECV);
+    RecvMessagePacket recvMessagePacket = (RecvMessagePacket) basePacket;
+    Assert.assertEquals(MessageType.TEXT, recvMessagePacket.getMessageType());
+    TextMessage textMessage = (TextMessage) recvMessagePacket.getBaseMessage();
+    Assert.assertEquals(uuid, textMessage.getUuid());
+    Assert.assertEquals(sentBy, textMessage.getSentBy());
+    Assert.assertEquals(sendTo, textMessage.getSendTo());
+    Assert.assertEquals(text, textMessage.getText());
+
+
+    client1.sendTextMessage(sentBy, "unknown", text);
+    while((basePacket = client1.nextPacket()).getType() != PacketType.FAIL);
+    Assert.assertTrue(true);
 
   }
 

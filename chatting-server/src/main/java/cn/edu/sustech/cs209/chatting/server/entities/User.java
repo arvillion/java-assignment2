@@ -23,17 +23,11 @@ public class User {
     return name;
   }
 
-  public void addIndividualConversion(User user) throws Exception {
-    if (individualConversions.containsKey(user)) {
-      throw new Exception("conversion already exists");
-    }
-    individualConversions.put(user, new Conversation());
+  public void addIndividualConversion(User user, Conversation conversation) {
+    individualConversions.put(user, conversation);
   }
 
-  public void addGroupConversion(Group group, Conversation conversation) throws DuplicateGroupNameException {
-    if (groupConversions.containsKey(group)) {
-      throw new DuplicateGroupNameException();
-    }
+  public void addGroupConversion(Group group, Conversation conversation) {
     groupConversions.put(group, conversation);
   }
 

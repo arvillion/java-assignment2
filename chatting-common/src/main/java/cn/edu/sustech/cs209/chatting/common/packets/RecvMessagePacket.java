@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class RecvMessagePacket extends BasePacket {
   private BaseMessage baseMessage;
@@ -41,6 +42,7 @@ public class RecvMessagePacket extends BasePacket {
     try {
       ds.writeByte(type.ordinal());
       ds.writeLong(baseMessage.getTimestamp());
+      Utils.writeUUID(baseMessage.getUuid(), bs);
       String sentBy = baseMessage.getSentBy();
       String sentTo = baseMessage.getSendTo();
 
@@ -58,15 +60,16 @@ public class RecvMessagePacket extends BasePacket {
   protected void decode(ByteBuffer buffer) throws DecodeException {
     type = MessageType.get(buffer.get());
     Long timestamp = buffer.getLong();
+    UUID uuid = Utils.readUUID(buffer);
     String sentBy = Utils.readShortString(buffer, StandardCharsets.UTF_8);
     String sentTo = Utils.readShortString(buffer, StandardCharsets.UTF_8);
 
     if (type == MessageType.TEXT) {
-      TextMessage textMessage = new TextMessage(timestamp, sentBy, sentTo);
+      TextMessage textMessage = new TextMessage(uuid, timestamp, sentBy, sentTo);
       textMessage.decodeContent(buffer);
       baseMessage = textMessage;
     } else {
-      FileMetaMessage fileMetaMessage = new FileMetaMessage(timestamp, sentBy, sentTo);
+      FileMetaMessage fileMetaMessage = new FileMetaMessage(uuid, timestamp, sentBy, sentTo);
       fileMetaMessage.decodeContent(buffer);
       baseMessage = fileMetaMessage;
     }

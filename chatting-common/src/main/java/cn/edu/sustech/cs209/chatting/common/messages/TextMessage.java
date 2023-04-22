@@ -2,17 +2,18 @@ package cn.edu.sustech.cs209.chatting.common.messages;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class TextMessage extends BaseMessage{
   private String text;
 
-  public TextMessage(Long timestamp, String sentBy, String sendTo, String text) {
-    super(timestamp, sentBy, sendTo);
+  public TextMessage(UUID uuid, Long timestamp, String sentBy, String sendTo, String text) {
+    super(uuid, timestamp, sentBy, sendTo);
     this.text = text;
   }
 
-  public TextMessage(Long timestamp, String sentBy, String sendTo) {
-    super(timestamp, sentBy, sendTo);
+  public TextMessage(UUID uuid, Long timestamp, String sentBy, String sendTo) {
+    super(uuid, timestamp, sentBy, sendTo);
   }
 
   @Override

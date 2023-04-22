@@ -1,23 +1,25 @@
 package cn.edu.sustech.cs209.chatting.server.entities;
 
+import cn.edu.sustech.cs209.chatting.common.messages.BaseMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Conversation {
-  private List<Message> messages;
+  private List<BaseMessage> messages;
 
   public Conversation() {
     messages = new ArrayList<>();
   }
 
-  public void addMessage(Message m) {
+  public void addMessage(BaseMessage m) {
     messages.add(m);
   }
 
   /**
    * Get messages sorted by timestamp in ascending order
    */
-  public List<Message> getMessages() {
+  public List<BaseMessage> getMessages() {
     return messages;
   }
 

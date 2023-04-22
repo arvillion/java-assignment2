@@ -1,11 +1,11 @@
 package cn.edu.sustech.cs209.chatting.server;
 
+import cn.edu.sustech.cs209.chatting.common.messages.BaseMessage;
+import cn.edu.sustech.cs209.chatting.common.messages.TextMessage;
 import cn.edu.sustech.cs209.chatting.server.entities.Conversation;
 import cn.edu.sustech.cs209.chatting.server.entities.Group;
 import cn.edu.sustech.cs209.chatting.server.entities.User;
-import cn.edu.sustech.cs209.chatting.server.exceptions.DuplicateGroupNameException;
-import cn.edu.sustech.cs209.chatting.server.exceptions.InvalidInputException;
-import cn.edu.sustech.cs209.chatting.server.exceptions.WrongUnameException;
+import cn.edu.sustech.cs209.chatting.server.exceptions.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,10 +15,12 @@ import java.util.*;
 public class Server implements Runnable {
   private static Map<String, User> registeredUsers = new HashMap<>();
   private static Map<String, User> onlineUsers = new HashMap<>();
+  private static ConversionStorage conversionStorage = new ConversionStorage();
+
 
   private static Map<String, Group> groups = new HashMap<>();
-//  private static Map<String, ClientHandler> clientHandlers = new HashMap<>();
-
+  private static Map<UUID, BaseMessage> messages = new HashMap<>();
+  private static Map<User, ClientHandler> clientHandlerMap = new HashMap<>();
   private int LISTEN_PORT = 23456;
 
   public static User userLogin(String username, ClientHandler clientHandler) throws InvalidInputException, WrongUnameException {
@@ -31,7 +33,7 @@ public class Server implements Runnable {
     }
     User user = registeredUsers.get(username);
     onlineUsers.put(username, user);
-//    clientHandlers.put(username, clientHandler);
+    clientHandlerMap.put(user, clientHandler);
     return user;
   }
 
@@ -49,7 +51,7 @@ public class Server implements Runnable {
 
   public static void userQuit(String username) {
     onlineUsers.remove(username);
-//    clientHandlers.remove(username);
+    clientHandlerMap.remove(registeredUsers.get(username));
   }
 
   public static List<String> getOnlineUsers() {
@@ -87,6 +89,52 @@ public class Server implements Runnable {
 
     for (User u : users) {
       u.addGroupConversion(group, conversation);
+    }
+  }
+
+  public static void newTextMessage(User user, TextMessage textMessage) throws InvalidInputException, ServerException {
+    String sendTo = textMessage.getSendTo();
+    String sendBy = textMessage.getSentBy();
+    if (sendTo.startsWith("U:")) {
+      sendTo = sendTo.substring(2);
+      User receiver = registeredUsers.get(sendTo);
+      if (receiver == null) {
+        throw new InvalidInputException("Unreachable destination");
+      }
+      Conversation conversation = conversionStorage.getOrNewInvididualConversion(user, receiver);
+
+      conversation.addMessage(textMessage);
+      ClientHandler handler = clientHandlerMap.get(receiver);
+      if (handler != null) {
+        handler.sendMessage(textMessage);
+      }
+
+    } else if (sendTo.startsWith("G:")) {
+      sendTo = sendTo.substring(2);
+      Group receiver = groups.get(sendTo);
+      if (receiver == null) {
+        throw new InvalidInputException("Unreachable destination");
+      }
+      try {
+        Conversation conversation = conversionStorage.getGroupConversion(receiver);
+        conversation.addMessage(textMessage);
+      } catch (ConversionNotFoundException e) {
+        throw new ServerException();
+      }
+
+      List<User> groupMembers = receiver.getMembers();
+      for(User member : groupMembers) {
+        if (member == user) {
+          continue;
+        }
+        ClientHandler handler = clientHandlerMap.get(member);
+        if (handler != null) {
+          handler.sendMessage(textMessage);
+        }
+      }
+
+    } else {
+      throw new InvalidInputException("Wrong sendTo format");
     }
   }
 

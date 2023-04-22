@@ -1,14 +1,14 @@
 package cn.edu.sustech.cs209.chatting.server;
+import cn.edu.sustech.cs209.chatting.common.messages.BaseMessage;
+import cn.edu.sustech.cs209.chatting.common.messages.MessageType;
+import cn.edu.sustech.cs209.chatting.common.messages.TextMessage;
 import cn.edu.sustech.cs209.chatting.common.packets.PacketReader;
 import cn.edu.sustech.cs209.chatting.common.packets.*;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 import cn.edu.sustech.cs209.chatting.server.entities.User;
-import cn.edu.sustech.cs209.chatting.server.exceptions.DuplicateGroupNameException;
-import cn.edu.sustech.cs209.chatting.server.exceptions.InvalidInputException;
+import cn.edu.sustech.cs209.chatting.server.exceptions.*;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.InvalidPacketException;
-import cn.edu.sustech.cs209.chatting.server.exceptions.NotLoginException;
-import cn.edu.sustech.cs209.chatting.server.exceptions.WrongUnameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 
 public class ClientHandler implements Runnable{
@@ -75,17 +76,40 @@ public class ClientHandler implements Runnable{
   }
 
   private void handleSendMessage(SendMessagePacket pkt) throws IOException {
+    MessageType messageType = pkt.getMessageType();
+    BaseMessage baseMessage = pkt.getBaseMessage();
+    logger.info("Receive packet [SEND_MSG]: type={} sentBy={} sendTo={}", messageType, baseMessage.getSentBy(), baseMessage.getSendTo());
 
+    try {
+      switch (messageType) {
+        case TEXT -> {
+          Server.newTextMessage(user, (TextMessage) baseMessage);
+          sendACK(baseMessage.getUuid());
+        }
+        default -> {
+          throw new InvalidInputException("Unsupported message");
+        }
+      }
+
+    } catch (InvalidInputException e) {
+      sendFail(e.getMessage());
+    } catch (ServerException e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  private void handleReceiveMessage(RecvMessagePacket pkt) throws IOException {
 
-  }
 
 
 
   private void handleUnknown() {
 
+  }
+
+  private void sendACK(UUID uuid) throws IOException {
+    logger.info("Send packet [ACK]");
+    AckPacket ackPacket = new AckPacket(uuid);
+    packetSend(ackPacket);
   }
 
   private void sendIndividualChatList() throws IOException {
@@ -186,9 +210,6 @@ public class ClientHandler implements Runnable{
           case MSG_SEND:
             SendMessagePacket sendMessagePacket = (SendMessagePacket) pkt;
             handleSendMessage(sendMessagePacket);
-          case MSG_RECV:
-            RecvMessagePacket recvMessagePacket = (RecvMessagePacket) pkt;
-            handleReceiveMessage(recvMessagePacket);
           default:
             handleUnknown();
         }
@@ -205,6 +226,20 @@ public class ClientHandler implements Runnable{
       }
     }
 
+  }
+
+  public void sendMessage(TextMessage textMessage) {
+    logger.info("Send packet [RECV_MSG]: type=TEXT sentBy={} sendTo={}", textMessage.getSendTo(), textMessage.getSendTo());
+    RecvMessagePacket packet = new RecvMessagePacket(textMessage);
+    try {
+      packetSend(packet);
+    } catch (IOException e) {
+      try {
+        quit();
+      } catch (NotLoginException ex) {
+
+      }
+    }
   }
 
   public ClientHandler(Socket aSocket) {
