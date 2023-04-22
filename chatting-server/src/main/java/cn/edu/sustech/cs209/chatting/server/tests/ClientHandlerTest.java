@@ -6,20 +6,23 @@ import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 import cn.edu.sustech.cs209.chatting.server.Server;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.InvalidPacketException;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class ClientHandlerTest {
-  final static int SERVER_PORT = 30045;
+  int SERVER_PORT = 30045;
   final static String HOST = "localhost";
-  @BeforeClass
-  public static void setUpServer() throws IOException {
-
+  @Before
+  public void setUpServer() throws IOException {
+    SERVER_PORT = new Random().nextInt(20000) + 10000;
     Server server = new Server(SERVER_PORT);
     Thread thread = new Thread(server);
     thread.start();
@@ -77,8 +80,32 @@ public class ClientHandlerTest {
   }
 
   @Test
-  public void testGroupChatList() throws IOException {
+  public void testGroupChatList() throws IOException, EncodeException, DecodeException, InvalidPacketException {
     Client client1 = new Client(HOST, SERVER_PORT);
+    Client client2 = new Client(HOST, SERVER_PORT);
+    Client client3 = new Client(HOST, SERVER_PORT);
+
+    registerAndLogin(client1, "user1", "pwd");
+    registerAndLogin(client2, "user2", "pwd");
+    registerAndLogin(client3, "user3", "pwd");
+
+    BasePacket basePacket;
+    while((basePacket = client1.nextPacket()).getType() != PacketType.GROUP_CHAT_LIST);
+    GroupChatListPacket groupChatListPacket = (GroupChatListPacket) basePacket;
+    Assert.assertEquals(0, groupChatListPacket.getGroupList().size());
+
+    List<String> members = new ArrayList<>();
+    String groupName = "groupA";
+    client1.createGroup(groupName, members);
+    while((basePacket = client1.nextPacket()).getType() != PacketType.FAIL);
+    Assert.assertEquals(PacketType.FAIL, basePacket.getType());
+
+    members.add("user2");
+    client1.createGroup(groupName, members);
+    while((basePacket = client1.nextPacket()).getType() != PacketType.GROUP_CHAT_LIST);
+    GroupChatListPacket groupChatListPacket1 = (GroupChatListPacket) basePacket;
+    Assert.assertEquals(1, groupChatListPacket1.getGroupList().size());
+
   }
 
   @Test

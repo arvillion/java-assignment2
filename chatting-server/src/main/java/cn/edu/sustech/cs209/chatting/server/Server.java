@@ -10,10 +10,7 @@ import cn.edu.sustech.cs209.chatting.server.exceptions.WrongUnameException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Server implements Runnable {
   private static Map<String, User> registeredUsers = new HashMap<>();
@@ -71,16 +68,19 @@ public class Server implements Runnable {
     if (groups.containsKey(groupName)) {
       throw new DuplicateGroupNameException();
     }
+    Set<String> uniqueUsernames = new HashSet<>(usernames);
+    if (uniqueUsernames.size() < 2) {
+      throw new InvalidInputException("Too few members");
+    }
 
     List<User> users = new ArrayList<>();
-    for (String username : usernames) {
+    for (String username : uniqueUsernames) {
       User u = registeredUsers.get(username);
       if (u == null) {
         throw new InvalidInputException(String.format("User %s does not exist", username));
       }
       users.add(u);
     }
-
     Group group = new Group(groupName, users);
     groups.put(groupName, group);
     Conversation conversation = new Conversation();

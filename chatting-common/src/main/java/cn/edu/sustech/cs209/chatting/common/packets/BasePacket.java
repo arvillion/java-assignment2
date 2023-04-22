@@ -20,6 +20,7 @@ public abstract class BasePacket {
 
   public ByteBuffer toBytes() throws EncodeException{
     ByteBuffer bodyBuffer = encode();
+    bodyBuffer.clear();
     ByteBuffer buffer = ByteBuffer.allocate(5 + bodyBuffer.limit());
     buffer.put((byte)type.ordinal());
     buffer.putInt(buffer.capacity());

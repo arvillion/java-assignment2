@@ -62,6 +62,7 @@ public class ClientHandler implements Runnable{
   private void handleCreateGroup(NewGroupPacket pkt) throws IOException {
     String groupName = pkt.getGroupName();
     List<String> members = pkt.getMembers();
+    members.add(user.getName());
     try {
       Server.newGroup(groupName, members);
       sendOK();
@@ -71,6 +72,14 @@ public class ClientHandler implements Runnable{
     } catch (DuplicateGroupNameException e) {
       sendFail(String.format("Group name \"%s\" already exists", groupName));
     }
+  }
+
+  private void handleSendMessage(SendMessagePacket pkt) throws IOException {
+
+  }
+
+  private void handleReceiveMessage(RecvMessagePacket pkt) throws IOException {
+
   }
 
 
@@ -170,6 +179,16 @@ public class ClientHandler implements Runnable{
             RegisterPacket registerPacket = (RegisterPacket) pkt;
             handleRegister(registerPacket);
             break;
+          case NEW_GROUP:
+            NewGroupPacket newGroupPacket = (NewGroupPacket) pkt;
+            handleCreateGroup(newGroupPacket);
+            break;
+          case MSG_SEND:
+            SendMessagePacket sendMessagePacket = (SendMessagePacket) pkt;
+            handleSendMessage(sendMessagePacket);
+          case MSG_RECV:
+            RecvMessagePacket recvMessagePacket = (RecvMessagePacket) pkt;
+            handleReceiveMessage(recvMessagePacket);
           default:
             handleUnknown();
         }

@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class PacketsTest {
   @Test
@@ -102,6 +103,7 @@ public class PacketsTest {
     Assert.assertEquals(sentBy, textMessage1.getSentBy());
     Assert.assertEquals(sentTo, textMessage1.getSendTo());
     Assert.assertEquals(text, textMessage1.getText());
+    Assert.assertEquals(sendMessagePacket.getMid(), sendMessagePacket1.getMid());
   }
 
   @Test
@@ -121,9 +123,12 @@ public class PacketsTest {
 
   @Test
   public void testAck() throws EncodeException, DecodeException {
-    AckPacket ackPacket = new AckPacket();
+    UUID uuid = UUID.randomUUID();
+    AckPacket ackPacket = new AckPacket(uuid);
     AckPacket ackPacket1 = new AckPacket();
-    ackPacket1.decodeFrom(ackPacket.toBytes());
+    ByteBuffer buf = ackPacket.toBytes();
+    ackPacket1.decodeFrom(buf);
+    Assert.assertEquals(uuid, ackPacket1.getMid());
   }
 
   @Test

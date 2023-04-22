@@ -1,14 +1,11 @@
 package cn.edu.sustech.cs209.chatting.common;
 
-import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.stream.Stream;
+import java.util.UUID;
 
 public class Utils {
   /**
@@ -54,5 +51,22 @@ public class Utils {
     DataOutputStream dos = new DataOutputStream(os);
     dos.writeInt(bytes.length);
     os.write(bytes);
+  }
+
+  public static void writeUUID(UUID uuid, OutputStream os) throws IOException {
+    DataOutputStream ds = new DataOutputStream(os);
+    ds.writeLong(uuid.getMostSignificantBits());
+    ds.writeLong(uuid.getLeastSignificantBits());
+  }
+
+  public static void writeUUID(UUID uuid, ByteBuffer buffer) {
+    buffer.putLong(uuid.getMostSignificantBits());
+    buffer.putLong(uuid.getLeastSignificantBits());
+  }
+
+  public static UUID readUUID(ByteBuffer buffer) {
+    Long ms = buffer.getLong();
+    Long ls = buffer.getLong();
+    return new UUID(ms, ls);
   }
 }
