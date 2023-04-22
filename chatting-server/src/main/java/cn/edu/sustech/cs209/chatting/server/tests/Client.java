@@ -5,6 +5,7 @@ import cn.edu.sustech.cs209.chatting.common.packets.*;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.InvalidPacketException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.OfflineException;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -51,8 +52,17 @@ public class Client {
     return uuid;
   }
 
-  public BasePacket nextPacket() throws IOException, DecodeException, InvalidPacketException {
+  public BasePacket nextPacket() throws IOException, DecodeException, InvalidPacketException, OfflineException {
     return packetReader.readPacket();
+  }
+
+  public void history(String target, Long timestamp) throws EncodeException, IOException {
+    LastRecvPacket lastRecvPacket = new LastRecvPacket(target, timestamp);
+    packetWriter.write(lastRecvPacket);
+  }
+
+  public void close() throws IOException {
+    socket.close();
   }
 
 

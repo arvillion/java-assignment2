@@ -11,12 +11,18 @@ public abstract class BaseMessage {
 
     private String sendTo;
     private UUID uuid;
+    private final MessageType messageType;
 
-    public BaseMessage(UUID uuid, Long timestamp, String sentBy, String sendTo) {
+    public BaseMessage(MessageType type, UUID uuid, Long timestamp, String sentBy, String sendTo) {
         this.uuid = uuid;
         this.timestamp = timestamp;
         this.sentBy = sentBy;
         this.sendTo = sendTo;
+        this.messageType = type;
+    }
+
+    public MessageType getMessageType() {
+        return messageType;
     }
 
     public UUID getUuid() {

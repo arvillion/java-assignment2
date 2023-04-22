@@ -26,4 +26,16 @@ public class Conversation {
   public Long getLastestTimestamp() {
     return messages.get(messages.size()-1).getTimestamp();
   }
+
+  public List<BaseMessage> getMessagesBeforeTimestamp(Long timestamp) {
+    List<BaseMessage> list = new ArrayList<>();
+    for (BaseMessage message : messages) {
+      if (message.getTimestamp() < timestamp) {
+        list.add(message);
+      } else {
+        break;
+      }
+    }
+    return list;
+  }
 }

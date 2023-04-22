@@ -6,6 +6,7 @@ import cn.edu.sustech.cs209.chatting.common.packets.PacketReader;
 import cn.edu.sustech.cs209.chatting.common.packets.*;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.OfflineException;
 import cn.edu.sustech.cs209.chatting.server.entities.User;
 import cn.edu.sustech.cs209.chatting.server.exceptions.*;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.InvalidPacketException;
@@ -15,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 
 
 public class ClientHandler implements Runnable{
@@ -76,7 +74,7 @@ public class ClientHandler implements Runnable{
   }
 
   private void handleSendMessage(SendMessagePacket pkt) throws IOException {
-    MessageType messageType = pkt.getMessageType();
+    MessageType messageType = pkt.getBaseMessage().getMessageType();
     BaseMessage baseMessage = pkt.getBaseMessage();
     logger.info("Receive packet [SEND_MSG]: type={} sentBy={} sendTo={}", messageType, baseMessage.getSentBy(), baseMessage.getSendTo());
 
@@ -98,12 +96,33 @@ public class ClientHandler implements Runnable{
     }
   }
 
+  private void handleLastRecv(LastRecvPacket pkt) throws IOException {
+    Long timestamp = pkt.getLastTimestamp();
+    String target = pkt.getChatId();
+    logger.info("Receive packet [LAST_RECV]: target={} timestamp={}", target, new Date(timestamp));
+    try {
+      List<BaseMessage> history = Server.fetchHistory(user, target, timestamp);
+
+      logger.info("{} history messages found", history.size());
+
+      // send messages in descending order of timestamp
+      Collections.reverse(history);
+      for (BaseMessage message : history) {
+        sendMessage(message);
+      }
+
+    } catch (InvalidInputException e) {
+      sendFail(e.getMessage());
+    }
+
+  }
 
 
 
 
-  private void handleUnknown() {
 
+  private void handleUnknown(BasePacket pkt) {
+    logger.info("Receive unknown packet");
   }
 
   private void sendACK(UUID uuid) throws IOException {
@@ -153,10 +172,9 @@ public class ClientHandler implements Runnable{
     }
   }
 
-  private void quit() throws NotLoginException {
-    requireLogined();
+  private void quit() {
     logger.info("User \"{}\" quits", user.getName());
-    Server.userQuit(user.getName());
+    Server.userQuit(user);
   }
 
   @Override
@@ -189,8 +207,6 @@ public class ClientHandler implements Runnable{
   private void doService() throws IOException {
     PacketReader packetReader = new PacketReader(in);
     while (true) {
-
-
       try {
         BasePacket pkt = packetReader.readPacket();
 
@@ -210,35 +226,33 @@ public class ClientHandler implements Runnable{
           case MSG_SEND:
             SendMessagePacket sendMessagePacket = (SendMessagePacket) pkt;
             handleSendMessage(sendMessagePacket);
+            break;
+          case LAST_RECV:
+            LastRecvPacket lastRecvPacket = (LastRecvPacket) pkt;
+            handleLastRecv(lastRecvPacket);
+            break;
           default:
-            handleUnknown();
+            handleUnknown(pkt);
         }
       } catch (InvalidPacketException e) {
         logger.warn("Invalid packet");
       } catch (DecodeException de) {
         logger.warn("Fail to decode packet from bytes");
-      } catch (IOException ioe) {
-        try {
-          quit();
-          break;
-        } catch (NotLoginException e) {
-        }
+      } catch (IOException | OfflineException ioe) {
+        quit();
+        break;
       }
     }
 
   }
 
-  public void sendMessage(TextMessage textMessage) {
-    logger.info("Send packet [RECV_MSG]: type=TEXT sentBy={} sendTo={}", textMessage.getSendTo(), textMessage.getSendTo());
-    RecvMessagePacket packet = new RecvMessagePacket(textMessage);
+  public void sendMessage(BaseMessage message) {
+    logger.info("Send packet [RECV_MSG]: type={} sentBy={} sendTo={} timestamp={}", message.getMessageType(), message.getSentBy(), message.getSendTo(), new Date(message.getTimestamp()));
+    RecvMessagePacket packet = new RecvMessagePacket(message);
     try {
       packetSend(packet);
     } catch (IOException e) {
-      try {
-        quit();
-      } catch (NotLoginException ex) {
-
-      }
+      quit();
     }
   }
 

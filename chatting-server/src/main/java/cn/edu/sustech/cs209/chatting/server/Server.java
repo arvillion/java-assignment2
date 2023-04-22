@@ -19,7 +19,7 @@ public class Server implements Runnable {
 
 
   private static Map<String, Group> groups = new HashMap<>();
-  private static Map<UUID, BaseMessage> messages = new HashMap<>();
+//  private static Map<UUID, BaseMessage> messages = new HashMap<>();
   private static Map<User, ClientHandler> clientHandlerMap = new HashMap<>();
   private int LISTEN_PORT = 23456;
 
@@ -49,9 +49,9 @@ public class Server implements Runnable {
     registeredUsers.put(username, user);
   }
 
-  public static void userQuit(String username) {
-    onlineUsers.remove(username);
-    clientHandlerMap.remove(registeredUsers.get(username));
+  public static void userQuit(User user) {
+    onlineUsers.remove(user.getName());
+    clientHandlerMap.remove(user);
   }
 
   public static List<String> getOnlineUsers() {
@@ -85,17 +85,59 @@ public class Server implements Runnable {
     }
     Group group = new Group(groupName, users);
     groups.put(groupName, group);
-    Conversation conversation = new Conversation();
 
-    for (User u : users) {
-      u.addGroupConversion(group, conversation);
-    }
+    Conversation conversation = conversionStorage.newGroupConversion(group);
   }
 
+  private static boolean isUserStr(String str) {
+    return str.startsWith("U:");
+  }
+
+  private static boolean isGroupStr(String str) {
+    return str.startsWith("G:");
+  }
+
+  /**
+   * Fetch chat history, in which messages are sorted by ascending order of timestamp
+   * @param user
+   * @param target
+   * @param timestamp
+   * @return
+   * @throws InvalidInputException
+   */
+  public static List<BaseMessage> fetchHistory(User user, String target, Long timestamp) throws InvalidInputException {
+    if (isUserStr(target)) {
+      String targetName = target.substring(2);
+      User targetUser = registeredUsers.get(targetName);
+      if (targetUser == null) {
+        throw new InvalidInputException("target user not exists");
+      }
+      try {
+        Conversation conversation = conversionStorage.getInvididualConversion(user, targetUser);
+        return conversation.getMessagesBeforeTimestamp(timestamp);
+      } catch (ConversionNotFoundException e) {
+        return new ArrayList<>();
+      }
+    } else if (isGroupStr(target)) {
+      String targetName = target.substring(2);
+      Group targetGroup = groups.get(targetName);
+      if (targetGroup == null) {
+        throw new InvalidInputException("target group not exists");
+      }
+      try {
+        Conversation conversation = conversionStorage.getGroupConversion(targetGroup);
+        return conversation.getMessagesBeforeTimestamp(timestamp);
+      } catch (ConversionNotFoundException e) {
+        return new ArrayList<>();
+      }
+    } else {
+      throw new InvalidInputException("Wrong target format");
+    }
+  }
   public static void newTextMessage(User user, TextMessage textMessage) throws InvalidInputException, ServerException {
     String sendTo = textMessage.getSendTo();
     String sendBy = textMessage.getSentBy();
-    if (sendTo.startsWith("U:")) {
+    if (isUserStr(sendTo)) {
       sendTo = sendTo.substring(2);
       User receiver = registeredUsers.get(sendTo);
       if (receiver == null) {
@@ -109,7 +151,7 @@ public class Server implements Runnable {
         handler.sendMessage(textMessage);
       }
 
-    } else if (sendTo.startsWith("G:")) {
+    } else if (isGroupStr(sendTo)) {
       sendTo = sendTo.substring(2);
       Group receiver = groups.get(sendTo);
       if (receiver == null) {

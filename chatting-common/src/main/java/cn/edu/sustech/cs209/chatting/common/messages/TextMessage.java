@@ -8,12 +8,12 @@ public class TextMessage extends BaseMessage{
   private String text;
 
   public TextMessage(UUID uuid, Long timestamp, String sentBy, String sendTo, String text) {
-    super(uuid, timestamp, sentBy, sendTo);
+    super(MessageType.TEXT, uuid, timestamp, sentBy, sendTo);
     this.text = text;
   }
 
   public TextMessage(UUID uuid, Long timestamp, String sentBy, String sendTo) {
-    super(uuid, timestamp, sentBy, sendTo);
+    super(MessageType.TEXT, uuid, timestamp, sentBy, sendTo);
   }
 
   @Override

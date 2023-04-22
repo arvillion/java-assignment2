@@ -16,19 +16,19 @@ import java.util.UUID;
 public class SendMessagePacket extends BasePacket{
 
   private BaseMessage baseMessage;
-  private MessageType messageType;
+//  private MessageType messageType;
 
 
   public SendMessagePacket(TextMessage textMessage) {
     super(PacketType.MSG_SEND);
     this.baseMessage = textMessage;
-    messageType = MessageType.TEXT;
+//    messageType = MessageType.TEXT;
   }
 
   public SendMessagePacket(FileMetaMessage fileMetaMessage) {
     super(PacketType.MSG_SEND);
     this.baseMessage = fileMetaMessage;
-    messageType = MessageType.FILE_META;
+//    messageType = MessageType.FILE_META;
   }
 
   public SendMessagePacket() {
@@ -41,7 +41,7 @@ public class SendMessagePacket extends BasePacket{
     ByteArrayOutputStream bs = new ByteArrayOutputStream();
     DataOutputStream ds = new DataOutputStream(bs);
     try {
-      ds.writeByte(messageType.ordinal());
+      ds.writeByte(baseMessage.getMessageType().ordinal());
       ds.writeLong(baseMessage.getTimestamp());
       Utils.writeUUID(baseMessage.getUuid(), ds);
 
@@ -60,12 +60,12 @@ public class SendMessagePacket extends BasePacket{
 
   @Override
   protected void decode(ByteBuffer buffer) throws DecodeException {
-    messageType = MessageType.get(buffer.get());
+    MessageType type = MessageType.get(buffer.get());
     Long timestamp = buffer.getLong();
     UUID uuid = Utils.readUUID(buffer);
     String sentBy = Utils.readShortString(buffer, StandardCharsets.UTF_8);
     String sentTo = Utils.readShortString(buffer, StandardCharsets.UTF_8);
-    if (messageType == MessageType.TEXT) {
+    if (type == MessageType.TEXT) {
       TextMessage textMessage = new TextMessage(uuid, timestamp, sentBy, sentTo);
       textMessage.decodeContent(buffer);
       baseMessage = textMessage;
@@ -80,7 +80,7 @@ public class SendMessagePacket extends BasePacket{
     return baseMessage;
   }
 
-  public MessageType getMessageType() {
-    return messageType;
-  }
+//  public MessageType getMessageType() {
+//    return messageType;
+//  }
 }

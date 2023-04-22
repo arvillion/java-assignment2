@@ -16,19 +16,24 @@ import java.util.UUID;
 
 public class RecvMessagePacket extends BasePacket {
   private BaseMessage baseMessage;
-  private MessageType type;
+//  private MessageType type;
 
 
-  public RecvMessagePacket(TextMessage textMessage) {
+//  public RecvMessagePacket(TextMessage textMessage) {
+//    super(PacketType.MSG_RECV);
+//    this.baseMessage = textMessage;
+////    type = MessageType.TEXT;
+//  }
+//
+//  public RecvMessagePacket(FileMetaMessage fileMetaMessage) {
+//    super(PacketType.MSG_RECV);
+//    this.baseMessage = fileMetaMessage;
+////    type = MessageType.FILE_META;
+//  }
+
+  public RecvMessagePacket(BaseMessage baseMessage) {
     super(PacketType.MSG_RECV);
-    this.baseMessage = textMessage;
-    type = MessageType.TEXT;
-  }
-
-  public RecvMessagePacket(FileMetaMessage fileMetaMessage) {
-    super(PacketType.MSG_RECV);
-    this.baseMessage = fileMetaMessage;
-    type = MessageType.FILE_META;
+    this.baseMessage = baseMessage;
   }
 
   public RecvMessagePacket() {
@@ -40,7 +45,7 @@ public class RecvMessagePacket extends BasePacket {
     ByteArrayOutputStream bs = new ByteArrayOutputStream();
     DataOutputStream ds = new DataOutputStream(bs);
     try {
-      ds.writeByte(type.ordinal());
+      ds.writeByte(baseMessage.getMessageType().ordinal());
       ds.writeLong(baseMessage.getTimestamp());
       Utils.writeUUID(baseMessage.getUuid(), bs);
       String sentBy = baseMessage.getSentBy();
@@ -58,13 +63,13 @@ public class RecvMessagePacket extends BasePacket {
 
   @Override
   protected void decode(ByteBuffer buffer) throws DecodeException {
-    type = MessageType.get(buffer.get());
+    MessageType messageType = MessageType.get(buffer.get());
     Long timestamp = buffer.getLong();
     UUID uuid = Utils.readUUID(buffer);
     String sentBy = Utils.readShortString(buffer, StandardCharsets.UTF_8);
     String sentTo = Utils.readShortString(buffer, StandardCharsets.UTF_8);
 
-    if (type == MessageType.TEXT) {
+    if (messageType == MessageType.TEXT) {
       TextMessage textMessage = new TextMessage(uuid, timestamp, sentBy, sentTo);
       textMessage.decodeContent(buffer);
       baseMessage = textMessage;
@@ -79,7 +84,7 @@ public class RecvMessagePacket extends BasePacket {
     return baseMessage;
   }
 
-  public MessageType getMessageType() {
-    return type;
-  }
+//  public MessageType getMessageType() {
+//    return type;
+//  }
 }

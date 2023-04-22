@@ -3,6 +3,8 @@ package cn.edu.sustech.cs209.chatting.common.packets;
 import cn.edu.sustech.cs209.chatting.common.packets.*;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.InvalidPacketException;
+import cn.edu.sustech.cs209.chatting.common.packets.exceptions.OfflineException;
+import jdk.jshell.execution.JdiExecutionControl;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -15,8 +17,11 @@ public class PacketReader {
     this.inputStream = inputStream;
   }
 
-  public BasePacket readPacket() throws IOException, InvalidPacketException, DecodeException {
+  public BasePacket readPacket() throws IOException, InvalidPacketException, DecodeException, OfflineException {
     int typeNum = inputStream.read();
+    if (typeNum == -1) {
+      throw new OfflineException();
+    }
     PacketType type = PacketType.get(typeNum);
     DataInputStream din = new DataInputStream(inputStream);
     int len = din.readInt();
@@ -73,6 +78,10 @@ public class PacketReader {
         AckPacket ackPacket = new AckPacket();
         ackPacket.decodeFrom(buf);
         return ackPacket;
+      case LAST_RECV:
+        LastRecvPacket lastRecvPacket = new LastRecvPacket();
+        lastRecvPacket.decodeFrom(buf);
+        return lastRecvPacket;
 
       default:
         throw new InvalidPacketException();
