@@ -7,7 +7,6 @@ import cn.edu.sustech.cs209.chatting.common.messages.MessageType;
 import cn.edu.sustech.cs209.chatting.common.messages.TextMessage;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
@@ -16,20 +15,6 @@ import java.util.UUID;
 
 public class RecvMessagePacket extends BasePacket {
   private BaseMessage baseMessage;
-//  private MessageType type;
-
-
-//  public RecvMessagePacket(TextMessage textMessage) {
-//    super(PacketType.MSG_RECV);
-//    this.baseMessage = textMessage;
-////    type = MessageType.TEXT;
-//  }
-//
-//  public RecvMessagePacket(FileMetaMessage fileMetaMessage) {
-//    super(PacketType.MSG_RECV);
-//    this.baseMessage = fileMetaMessage;
-////    type = MessageType.FILE_META;
-//  }
 
   public RecvMessagePacket(BaseMessage baseMessage) {
     super(PacketType.MSG_RECV);

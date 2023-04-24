@@ -12,10 +12,12 @@ import java.util.List;
 
 public class GroupChatListPacket extends BasePacket {
   private List<String> groupList;
+
   public GroupChatListPacket(List<String> list) {
     super(PacketType.GROUP_CHAT_LIST);
     groupList = list;
   }
+
   public GroupChatListPacket() {
     super(PacketType.GROUP_CHAT_LIST);
     groupList = new ArrayList<>();
@@ -34,7 +36,7 @@ public class GroupChatListPacket extends BasePacket {
         bs.write(bytes.length);
         bs.write(bytes);
       }
-    } catch(IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       throw new EncodeException();
     }

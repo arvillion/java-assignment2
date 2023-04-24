@@ -3,7 +3,6 @@ package cn.edu.sustech.cs209.chatting.common.packets;
 import cn.edu.sustech.cs209.chatting.common.Utils;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,7 +12,9 @@ import java.nio.charset.StandardCharsets;
 public class LastRecvPacket extends BasePacket{
 
   private String chatId;
+
   private Long lastTimestamp;
+
   public LastRecvPacket() {
     super(PacketType.LAST_RECV);
   }

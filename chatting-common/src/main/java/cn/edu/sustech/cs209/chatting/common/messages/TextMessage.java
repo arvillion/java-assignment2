@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-public class TextMessage extends BaseMessage{
+public class TextMessage extends BaseMessage {
   private String text;
 
   public TextMessage(UUID uuid, Long timestamp, String sentBy, String sendTo, String text) {

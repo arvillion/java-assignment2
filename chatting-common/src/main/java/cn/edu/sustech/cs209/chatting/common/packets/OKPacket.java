@@ -10,6 +10,7 @@ public class OKPacket extends BasePacket {
   public OKPacket() {
     super(PacketType.OK);
   }
+
   @Override
   protected ByteBuffer encode() throws EncodeException {
     return ByteBuffer.allocate(0);

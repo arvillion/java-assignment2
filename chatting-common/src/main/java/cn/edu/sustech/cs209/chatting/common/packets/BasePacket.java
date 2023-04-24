@@ -2,7 +2,6 @@ package cn.edu.sustech.cs209.chatting.common.packets;
 
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
-
 import java.nio.ByteBuffer;
 
 public abstract class BasePacket {
@@ -11,18 +10,20 @@ public abstract class BasePacket {
   BasePacket(PacketType type) {
     this.type = type;
   }
+
   protected abstract ByteBuffer encode() throws EncodeException;
+
   protected abstract void decode(ByteBuffer buffer) throws DecodeException;
 
   public PacketType getType() {
     return type;
   }
 
-  public ByteBuffer toBytes() throws EncodeException{
+  public ByteBuffer toBytes() throws EncodeException {
     ByteBuffer bodyBuffer = encode();
     bodyBuffer.clear();
     ByteBuffer buffer = ByteBuffer.allocate(5 + bodyBuffer.limit());
-    buffer.put((byte)type.ordinal());
+    buffer.put((byte) type.ordinal());
     buffer.putInt(buffer.capacity());
     buffer.put(bodyBuffer);
     return buffer;
@@ -43,5 +44,5 @@ public abstract class BasePacket {
       throw new DecodeException();
     }
     decode(buffer);
-  };
+  }
 }

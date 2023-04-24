@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 
 public class PacketWriter {
   private OutputStream outputStream;
+
   public PacketWriter(OutputStream outputStream) {
     this.outputStream = outputStream;
   }

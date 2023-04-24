@@ -3,13 +3,13 @@ package cn.edu.sustech.cs209.chatting.common.packets;
 import cn.edu.sustech.cs209.chatting.common.Utils;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.DecodeException;
 import cn.edu.sustech.cs209.chatting.common.packets.exceptions.EncodeException;
-
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
 public class AckPacket extends BasePacket {
 
   private UUID mid;
+
   public AckPacket() {
     super(PacketType.ACK);
   }

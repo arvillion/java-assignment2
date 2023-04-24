@@ -12,10 +12,12 @@ import java.util.List;
 
 public class IndividualChatListPacket extends BasePacket {
   private List<String> individualList;
+
   public IndividualChatListPacket(List<String> list) {
     super(PacketType.INDIVIDUAL_CHAT_LIST);
     individualList = list;
   }
+
   public IndividualChatListPacket() {
     super(PacketType.INDIVIDUAL_CHAT_LIST);
     individualList = new ArrayList<>();

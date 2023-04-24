@@ -9,19 +9,19 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    public static void main(String[] args) {
-        launch();
-    }
+  public static void main(String[] args) {
+    launch();
+  }
 
-    @Override
-    public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main.fxml"));
-        stage.setScene(new Scene(fxmlLoader.load()));
-        stage.setTitle("Chatting Client");
+  @Override
+  public void start(Stage stage) throws IOException {
+    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main.fxml"));
+    stage.setScene(new Scene(fxmlLoader.load()));
+    stage.setTitle("Chatting Client");
 
-        Controller controller = fxmlLoader.getController();
-        stage.setOnHidden(e -> controller.exit());
+    Controller controller = fxmlLoader.getController();
+    stage.setOnHidden(e -> controller.exit());
 
-        stage.show();
-    }
+    stage.show();
+  }
 }

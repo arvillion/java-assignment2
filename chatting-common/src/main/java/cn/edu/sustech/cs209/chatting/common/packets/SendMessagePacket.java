@@ -13,16 +13,13 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-public class SendMessagePacket extends BasePacket{
+public class SendMessagePacket extends BasePacket {
 
   private BaseMessage baseMessage;
-//  private MessageType messageType;
-
 
   public SendMessagePacket(TextMessage textMessage) {
     super(PacketType.MSG_SEND);
     this.baseMessage = textMessage;
-//    messageType = MessageType.TEXT;
   }
 
   public SendMessagePacket(FileMetaMessage fileMetaMessage) {

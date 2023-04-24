@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 
 public class PacketReader {
   InputStream inputStream;
+
   public PacketReader(InputStream inputStream) {
     this.inputStream = inputStream;
   }
