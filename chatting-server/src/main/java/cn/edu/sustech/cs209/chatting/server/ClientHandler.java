@@ -40,6 +40,8 @@ public class ClientHandler implements Runnable{
       sendFail("Invalid input");
     } catch (WrongUnameException e) {
       sendFail("Wrong username or password");
+    } catch (AlreadyOnlineException e) {
+      sendFail("A user with the same name has logged in");
     }
   }
 
@@ -173,6 +175,7 @@ public class ClientHandler implements Runnable{
   }
 
   private void quit() {
+    if (user == null) return;
     logger.info("User \"{}\" quits", user.getName());
     Server.userQuit(user);
   }
@@ -189,7 +192,7 @@ public class ClientHandler implements Runnable{
   }
 
   private void startNotification() {
-    final int GAP_UPDATE_CHAT_LIST = 1000;
+    final int GAP_UPDATE_CHAT_LIST = 5000;
     new Timer().schedule(new TimerTask() {
       @Override
       public void run() {

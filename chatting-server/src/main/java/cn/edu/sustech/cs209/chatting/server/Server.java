@@ -23,13 +23,16 @@ public class Server implements Runnable {
   private static Map<User, ClientHandler> clientHandlerMap = new HashMap<>();
   private int LISTEN_PORT = 23456;
 
-  public static User userLogin(String username, ClientHandler clientHandler) throws InvalidInputException, WrongUnameException {
+  public static User userLogin(String username, ClientHandler clientHandler) throws InvalidInputException, WrongUnameException, AlreadyOnlineException {
     username = username.trim();
     if (username.length() == 0) {
       throw new InvalidInputException("username must not be null");
     }
     if (!registeredUsers.containsKey(username)) {
       throw new WrongUnameException();
+    }
+    if (onlineUsers.containsKey(username)) {
+      throw new AlreadyOnlineException();
     }
     User user = registeredUsers.get(username);
     onlineUsers.put(username, user);
@@ -50,6 +53,7 @@ public class Server implements Runnable {
   }
 
   public static void userQuit(User user) {
+    if (user == null) return;
     onlineUsers.remove(user.getName());
     clientHandlerMap.remove(user);
   }
@@ -87,6 +91,16 @@ public class Server implements Runnable {
     groups.put(groupName, group);
 
     Conversation conversation = conversionStorage.newGroupConversion(group);
+    String memberText = "Members: " + usernames;
+    BaseMessage memberMessage = new TextMessage(UUID.randomUUID(), new Date().getTime(), "SYS", "G:"+groupName, memberText);
+    conversation.addMessage(memberMessage);
+
+    for(User member : users) {
+      ClientHandler handler = clientHandlerMap.get(member);
+      if (handler != null) {
+        handler.sendMessage(memberMessage);
+      }
+    }
   }
 
   private static boolean isUserStr(String str) {
